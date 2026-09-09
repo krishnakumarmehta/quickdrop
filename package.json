@@ -1,0 +1,13 @@
+{
+  "name": "quickdrop",
+  "version": "1.0.0",
+  "description": "Ultra fast P2P file sharing - devices on same network auto-connect via WebRTC",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.17.1"
+  }
+}

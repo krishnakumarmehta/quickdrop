@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>QuickDrop – Instant File Share</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#e6262c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+
+<!-- floating background art + embers, purely decorative -->
+<div class="bg-fx" aria-hidden="true">
+  <img class="bg-art bg-art--1" src="img/space-thrusters.jpg" alt="">
+  <img class="bg-art bg-art--2" src="img/night-flight.jpg" alt="">
+  <div class="embers"></div>
+  <div class="scan-line"></div>
+</div>
+
+<!-- ============ SCREEN 1: SETUP (name + create/join room) ============ -->
+<div class="app setup-app" id="setup-screen">
+  <header class="brand">
+    <img src="img/mask-side.jpg" alt="" class="brand-mask">
+    <div>
+      <h1>QUICK<span>DROP</span></h1>
+      <p class="subtitle">J.A.R.V.I.S.-style file beam &mdash; device se device, seedha</p>
+    </div>
+  </header>
+
+  <div class="hud-card">
+    <label class="hud-label" for="name-input">1. Apna device ka naam likho</label>
+    <input type="text" id="name-input" class="hud-input" placeholder="jaise: Aditya-Phone" maxlength="24" autocomplete="off">
+    <p class="hint">Ye naam doosre devices ko peer-list me dikhega, taaki pata chale kaunsa device kiska hai.</p>
+  </div>
+
+  <div class="hud-card">
+    <label class="hud-label">2. Room banao ya kisi ke room me judo</label>
+
+    <div class="mode-tabs">
+      <button type="button" class="mode-tab active" data-mode="create">🛠️ Room Banao</button>
+      <button type="button" class="mode-tab" data-mode="join">🔗 Room Join Karo</button>
+      <button type="button" class="mode-tab" data-mode="auto">📡 Same WiFi (Auto)</button>
+    </div>
+
+    <div class="mode-panel" id="mode-create">
+      <p class="hint">Ek naya room-code banega. Wahi code doosre device par "Room Join Karo" me daal ke enter karna hai — chahe wo kisi bhi WiFi/mobile-data par ho.</p>
+      <button type="button" id="generate-room-btn" class="primary-btn">⚡ Naya Room Banao</button>
+    </div>
+
+    <div class="mode-panel" id="mode-join" hidden>
+      <label class="hud-label" for="join-code-input">Room ka code daalo</label>
+      <input type="text" id="join-code-input" class="hud-input code-input" placeholder="jaise: A3K9F2" maxlength="12" autocomplete="off">
+      <p class="hint">Yahi code jo room banane wale ne share kiya hai — dono taraf same code hona chahiye.</p>
+    </div>
+
+    <div class="mode-panel" id="mode-auto" hidden>
+      <p class="hint">Koi code nahi chahiye. Sirf same WiFi/hotspot par jitne devices ye site kholenge, wo apne-aap ek doosre ko dikh jayenge. Alag network (jaise ek WiFi pe, ek mobile data pe) walon ke liye ye kaam nahi karega — uske liye "Room Join Karo" wala option use karo.</p>
+    </div>
+  </div>
+
+  <button type="button" id="enter-app-btn" class="primary-btn enter-btn">🚀 Suit Up &amp; Connect</button>
+  <p class="hint" id="setup-error"></p>
+
+  <footer class="footer">Developed by <span>Aditya</span></footer>
+</div>
+
+<!-- ============ SCREEN 2: MAIN APP (transfer UI) ============ -->
+<div class="app" id="app-screen" hidden>
+  <header>
+    <img src="img/mask-side.jpg" alt="" class="header-mask">
+    <div>
+      <h1>⚡ QuickDrop</h1>
+      <p class="subtitle">Tum: <span id="self-name-display">—</span></p>
+    </div>
+  </header>
+
+  <div id="status" class="status">Connecting...</div>
+
+  <div id="room-code-banner" class="room-code-banner" hidden>
+    <span class="room-code-label">Room Code</span>
+    <span class="room-code-value" id="room-code-value"></span>
+    <button type="button" id="copy-code-btn" class="copy-btn">📋 Copy</button>
+  </div>
+
+  <button id="keepalive-btn" class="keepalive-btn" type="button">⚪ Enable Background Mode</button>
+  <p class="hint">Tab switch karo ya app minimize karo — ye tab active file transfer chalne ke liye zinda rakhega. (File bhejte/receive karte hi ye khud bhi ON ho jaata hai.) Best result ke liye phone ki "Add to Home Screen" bhi kar lena.</p>
+
+  <button type="button" id="change-room-btn" class="ghost-btn">🔄 Naam/Room badlo</button>
+
+  <div id="peer-area">
+    <div id="empty-state" class="empty-state">
+      <div class="pulse-circle"></div>
+      <p>Doosre device par bhi ye website kholiye<br>(same WiFi ya same room-code)</p>
+    </div>
+    <div id="peer-grid" class="peer-grid"></div>
+  </div>
+
+  <label class="zip-option">
+    <input type="checkbox" id="zip-toggle">
+    Multiple files ko ek ZIP me bundle karke bhejo
+  </label>
+  <p class="hint">Kisi bhi type ki file bhej sakte ho — APK, PDF, ZIP, Video, Photo, Doc, kuch bhi.</p>
+
+  <input type="file" id="file-input" multiple hidden>
+
+  <div id="transfer-log" class="transfer-log"></div>
+
+  <footer class="footer">Developed by <span>Aditya</span></footer>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="client.js"></script>
+</body>
+</html>
