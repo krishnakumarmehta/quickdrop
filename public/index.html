@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -29,38 +29,38 @@
     <img src="img/mask-side.jpg" alt="" class="brand-mask">
     <div>
       <h1>QUICK<span>DROP</span></h1>
-      <p class="subtitle">J.A.R.V.I.S.-style file beam &mdash; device se device, seedha</p>
+      <p class="subtitle">J.A.R.V.I.S.-style file beam &mdash; direct device-to-device</p>
     </div>
   </header>
 
   <div class="hud-card">
-    <label class="hud-label" for="name-input">1. Apna device ka naam likho</label>
-    <input type="text" id="name-input" class="hud-input" placeholder="jaise: Krishna-Phone" maxlength="24" autocomplete="off">
-    <p class="hint">Ye naam doosre devices ko peer-list me dikhega, taaki pata chale kaunsa device kiska hai.</p>
+    <label class="hud-label" for="name-input">1. Enter your device name</label>
+    <input type="text" id="name-input" class="hud-input" placeholder="for example: Krishna-Phone" maxlength="24" autocomplete="off">
+    <p class="hint">This name appears in the peer list on other devices so they can identify you.</p>
   </div>
 
   <div class="hud-card">
-    <label class="hud-label">2. Room banao ya kisi ke room me judo</label>
+    <label class="hud-label">2. Create a room or join an existing room</label>
 
     <div class="mode-tabs">
-      <button type="button" class="mode-tab active" data-mode="create">🛠️ Room Banao</button>
-      <button type="button" class="mode-tab" data-mode="join">🔗 Room Join Karo</button>
+      <button type="button" class="mode-tab active" data-mode="create">🛠️ Create Room</button>
+      <button type="button" class="mode-tab" data-mode="join">🔗 Join Room</button>
       <button type="button" class="mode-tab" data-mode="auto">📡 Same WiFi (Auto)</button>
     </div>
 
     <div class="mode-panel" id="mode-create">
-      <p class="hint">Ek naya room-code banega. Wahi code doosre device par "Room Join Karo" me daal ke enter karna hai — chahe wo kisi bhi WiFi/mobile-data par ho.</p>
-      <button type="button" id="generate-room-btn" class="primary-btn">⚡ Naya Room Banao</button>
+      <p class="hint">A new room code will be generated. Enter the same code on the other device under "Join Room" — it works across any WiFi/mobile-data network.</p>
+      <button type="button" id="generate-room-btn" class="primary-btn">⚡ Create New Room</button>
     </div>
 
     <div class="mode-panel" id="mode-join" hidden>
-      <label class="hud-label" for="join-code-input">Room ka code daalo</label>
-      <input type="text" id="join-code-input" class="hud-input code-input" placeholder="jaise: A3K9F2" maxlength="12" autocomplete="off">
-      <p class="hint">Yahi code jo room banane wale ne share kiya hai — dono taraf same code hona chahiye.</p>
+      <label class="hud-label" for="join-code-input">Enter room code</label>
+      <input type="text" id="join-code-input" class="hud-input code-input" placeholder="for example: A3K9F2" maxlength="12" autocomplete="off">
+      <p class="hint">Use the exact code shared by the room creator — both devices must use the same code.</p>
     </div>
 
     <div class="mode-panel" id="mode-auto" hidden>
-      <p class="hint">Koi code nahi chahiye. Sirf same WiFi/hotspot par jitne devices ye site kholenge, wo apne-aap ek doosre ko dikh jayenge. Alag network (jaise ek WiFi pe, ek mobile data pe) walon ke liye ye kaam nahi karega — uske liye "Room Join Karo" wala option use karo.</p>
+      <p class="hint">No code is needed. Devices that open this site on the same WiFi/hotspot will discover each other automatically. This does not work across different networks (for example one on WiFi and one on mobile data) — use "Join Room" for that.</p>
     </div>
   </div>
 
@@ -76,7 +76,7 @@
     <img src="img/mask-side.jpg" alt="" class="header-mask">
     <div>
       <h1>⚡ QuickDrop</h1>
-      <p class="subtitle">Tum: <span id="self-name-display">—</span></p>
+      <p class="subtitle">You: <span id="self-name-display">—</span></p>
     </div>
   </header>
 
@@ -89,23 +89,23 @@
   </div>
 
   <button id="keepalive-btn" class="keepalive-btn" type="button">⚪ Enable Background Mode</button>
-  <p class="hint">Tab switch karo ya app minimize karo — ye tab active file transfer chalne ke liye zinda rakhega. (File bhejte/receive karte hi ye khud bhi ON ho jaata hai.) Best result ke liye phone ki "Add to Home Screen" bhi kar lena.</p>
+  <p class="hint">Switch tabs or minimize the app — this helps keep active file transfers alive. (It also turns ON automatically while sending/receiving files.) For best results, also use your phone's "Add to Home Screen".</p>
 
-  <button type="button" id="change-room-btn" class="ghost-btn">🔄 Naam/Room badlo</button>
+  <button type="button" id="change-room-btn" class="ghost-btn">🔄 Change Name/Room</button>
 
   <div id="peer-area">
     <div id="empty-state" class="empty-state">
       <div class="pulse-circle"></div>
-      <p>Doosre device par bhi ye website kholiye<br>(same WiFi ya same room-code)</p>
+      <p>Open this website on the other device too<br>(same WiFi or same room code)</p>
     </div>
     <div id="peer-grid" class="peer-grid"></div>
   </div>
 
   <label class="zip-option">
     <input type="checkbox" id="zip-toggle">
-    Multiple files ko ek ZIP me bundle karke bhejo
+    Send multiple files as one ZIP bundle
   </label>
-  <p class="hint">Kisi bhi type ki file bhej sakte ho — APK, PDF, ZIP, Video, Photo, Doc, kuch bhi.</p>
+  <p class="hint">You can send any file type — APK, PDF, ZIP, Video, Photo, Docs, anything.</p>
 
   <input type="file" id="file-input" multiple hidden>
 

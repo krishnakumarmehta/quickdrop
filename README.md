@@ -1,62 +1,62 @@
 # QuickDrop ⚡ — Instant P2P File Sharing
 ### Developed by Krishna
 
-Jaise Snapdrop/AirDrop kaam karta hai — same WiFi par jitne bhi device browser me ye website kholenge, wo apne aap ek-doosre ko dekh lenge aur direct (peer-to-peer, WebRTC) file bhej sakenge. File server se hoke nahi jaati, isliye speed WiFi jitni fast hoti hai. **PC↔PC, PC↔Mobile, Mobile↔Mobile — sab combination me kaam karta hai.**
+Works like Snapdrop/AirDrop: any devices on the same WiFi that open this website in a browser will automatically discover each other and send files directly (peer-to-peer, WebRTC). Files do not pass through the server, so transfer speed is as fast as your WiFi. **PC↔PC, PC↔Mobile, Mobile↔Mobile — all combinations work.**
 
 ## ✨ Features
-- **Auto-detect**: Website khulte hi same WiFi wale devices turant peer-list me dikh jaate hain — kuch dabana nahi padta
-- **Room Code**: Alag network / mobile data walon ko bhi connect karna ho toh dono taraf same code (jaise `opus2`) daal do — turant connect ho jayenge, chahe kahin bhi ho
-- **Har file type supported**: APK, PDF, ZIP, Video, Photo, Doc — kuch bhi, koi restriction nahi
-- **ZIP bundling**: Multiple files select karo aur "Bundle as ZIP" checkbox on karke ek hi ZIP file me bhejo
-- **Fast + Private**: File data seedha device-se-device jaata hai (WebRTC), server sirf introduction karata hai — file kabhi server pe store nahi hoti
+- **Auto-detect**: As soon as the site opens, devices on the same WiFi appear in the peer list automatically — no extra action needed
+- **Room Code**: To connect devices on different networks/mobile data, enter the same code (for example `opus2`) on both sides — they connect instantly from anywhere
+- **All file types supported**: APK, PDF, ZIP, Video, Photo, Docs — no restrictions
+- **ZIP bundling**: Select multiple files and enable "Bundle as ZIP" to send everything as one ZIP file
+- **Fast + Private**: File data goes directly device-to-device (WebRTC). The server only introduces peers — files are never stored on the server
 
-## 🚀 Deploy karna (Render.com — recommended, FREE)
+## 🚀 Deployment (Render.com — recommended, FREE)
 
-> ⚠️ **Vercel is website ke liye kaam NAHI karega** — Vercel serverless hai aur WebSocket (real-time signaling) support nahi karta. Isliye Render, Railway, ya Fly.io use karo — ye sab free tier me persistent Node server chalate hain.
+> ⚠️ **Vercel will NOT work for this website** — Vercel is serverless and does not support persistent WebSocket signaling. Use Render, Railway, or Fly.io instead; all provide free tiers with persistent Node servers.
 
-1. Is folder ko GitHub repo me push karo
-2. https://render.com par jao → "New +" → "Web Service" → apna GitHub repo select karo
+1. Push this folder to a GitHub repository
+2. Go to https://render.com → "New +" → "Web Service" → select your GitHub repo
 3. Settings:
    - **Build Command:** `npm install`
    - **Start Command:** `npm start`
-4. Deploy dabao — 2-3 min me live URL milega (e.g. `https://quickdrop.onrender.com`)
-5. Ye URL kisi bhi device se kholo (WiFi ho ya mobile data, farak nahi padta) — same WiFi walon ko auto-detect hoga, alag network walon ke liye dono "Room Code" box me same code daalein
+4. Click Deploy — you will get a live URL in 2-3 minutes (for example `https://quickdrop.onrender.com`)
+5. Open that URL on any device (WiFi or mobile data). Same-WiFi devices auto-detect; for different networks, enter the same value in both "Room Code" boxes
 
-## 🖥️ Local WiFi par chalana (bina deploy kiye)
+## 🖥️ Run on local WiFi (without deployment)
 
-1. Node.js install karo: https://nodejs.org
-2. Terminal me:
+1. Install Node.js: https://nodejs.org
+2. In a terminal:
    ```
    npm install
    npm start
    ```
-3. Terminal me local IP dikhega, jaise `http://192.168.1.5:3000`
-   - Local IP nikalne ke liye: Windows → `ipconfig`, Mac/Linux → `ifconfig`
-4. Sab devices (PC/mobile) ko **same WiFi** se connect karke browser me wahi URL kholo
-5. 2nd device khulte hi dono ek-doosre ko dikhne lagenge — tap karo aur file bhej do
+3. The terminal will show your local IP, for example `http://192.168.1.5:3000`
+   - To find local IP manually: Windows → `ipconfig`, Mac/Linux → `ifconfig`
+4. Connect all devices (PC/mobile) to the **same WiFi** and open that URL in a browser
+5. As soon as the second device opens it, both devices will see each other — tap and send files
 
-## 🔑 Room Code kab use karo
-- **Same WiFi** par ho → kuch mat karo, auto connect ho jayega
-- **Alag network / mobile data** par ho (ek phone WiFi pe, doosra 4G/5G pe, ya alag ghar/office) → dono devices me "Room Code" box me exact same word daalo (case-insensitive), Join dabao — turant connect
+## 🔑 When to use Room Code
+- On **same WiFi** → do nothing, auto-connect will work
+- On **different networks / mobile data** (for example one phone on WiFi, another on 4G/5G, or in different homes/offices) → enter the exact same value in both devices' "Room Code" boxes (case-insensitive), then tap Join
 
-## ⚙️ Kaise kaam karta hai
-- **Signaling server** (Node + WebSocket, `server.js`) sirf devices ko ek-doosre se "introduce" karata hai — same WiFi ya same room-code wale group me daal deta hai
-- Asli file transfer **WebRTC DataChannel** se seedha device-se-device jaata hai — 64KB chunks me stream hota hai (RAM overflow nahi hota, badi files bhi chalti hain)
-- STUN + free public TURN relay dono configured hain, isliye tricky networks (mobile data, strict NAT) par bhi connection ban jaata hai
+## ⚙️ How it works
+- The **signaling server** (Node + WebSocket, `server.js`) only introduces devices to each other — it groups by same WiFi or same room code
+- Actual file transfer happens directly over **WebRTC DataChannel** — streamed in 64KB chunks (avoids RAM spikes and supports large files)
+- Both STUN and free public TURN relays are configured, so connections can still work on difficult networks (mobile data, strict NAT)
 
 ## 📁 Files
-- `server.js` — signaling server (room grouping: WiFi-based ya code-based)
+- `server.js` — signaling server (room grouping: WiFi-based or code-based)
 - `public/index.html`, `style.css`, `client.js` — frontend (UI + WebRTC + ZIP logic)
 
 ## 📲 Background Mode (tab switch / app minimize)
-Website me ab ek **"Enable Background Mode"** button hai (file bhejte/receive karte waqt khud bhi ON ho jaata hai). Ye 4 real techniques use karta hai:
-1. **Wake Lock** — screen sleep nahi hoti jab transfer chal raha ho
-2. **Silent keep-alive audio + Media Session** — OS ko lagta hai media play ho raha hai, isliye Chrome/Android tab ko kam throttle karta hai
-3. **Event-driven transfer** — background me bhi setTimeout ki jagah real events use hote hain, isliye transfer atakta nahi
-4. **PWA install ("Add to Home Screen")** — Android par isse background restrictions aur kam ho jaate hain
+The website now includes an **"Enable Background Mode"** button (it also turns on automatically while sending/receiving files). It uses 4 real techniques:
+1. **Wake Lock** — keeps the screen from sleeping while transfer is running
+2. **Silent keep-alive audio + Media Session** — makes the OS treat it like active media, so Chrome/Android throttles less
+3. **Event-driven transfer** — uses real events instead of setTimeout polling in background, reducing stalls
+4. **PWA install ("Add to Home Screen")** — further reduces background restrictions on Android
 
-**Honest note:** Koi bhi website 100% guarantee nahi de sakti ki app fully band karne ya switch karne ke baad bhi hamesha chalti rahe — ye OS-level policy hai (especially **iPhone/Safari** bahut aggressive hai background tabs suspend karne me). Ye sab techniques throttling ko *kaafi kam* kar dete hain (jaisa WhatsApp Web bhi karta hai), lekin bade files transfer karte waqt best result ke liye:
-- Phone ka screen on rakho
-- "Add to Home Screen" karke app jaisa install kar lo
-- Poori tarah app close mat karo, sirf switch karo
+**Honest note:** No website can guarantee 100% uninterrupted background execution after fully closing/switching apps — this is controlled by OS-level policy (especially **iPhone/Safari**, which suspends background tabs aggressively). These techniques reduce throttling significantly (similar to WhatsApp Web), but for best large-file transfer results:
+- Keep the phone screen on
+- Install via "Add to Home Screen"
+- Do not fully close the app; just switch away
 # quickdrop
