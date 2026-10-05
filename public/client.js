@@ -214,7 +214,22 @@ function renderPeers(list) {
   list.forEach(p => {
     const card = document.createElement('div');
     card.className = 'peer-card';
-    card.innerHTML = `<div class="peer-avatar">🦾</div><div class="peer-name">${escapeHtml(p.name)}</div><div class="peer-status" data-peer-status="${p.id}">tap to send</div>`;
+    const avatarEl = document.createElement('div');
+    avatarEl.className = 'peer-avatar';
+    avatarEl.textContent = '🦾';
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'peer-name';
+    nameEl.textContent = p.name;
+
+    const statusLabelEl = document.createElement('div');
+    statusLabelEl.className = 'peer-status';
+    statusLabelEl.setAttribute('data-peer-status', p.id);
+    statusLabelEl.textContent = 'tap to send';
+
+    card.appendChild(avatarEl);
+    card.appendChild(nameEl);
+    card.appendChild(statusLabelEl);
     card.onclick = () => {
       pendingPeerToPick = p.id;
       fileInput.click();
