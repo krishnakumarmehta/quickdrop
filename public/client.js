@@ -22,7 +22,7 @@ const ICE_SERVERS = [
   // Traversal Service and put your own TURN credentials here instead.
 ];
 
-const ICE_GATHER_TIMEOUT_MS = 15000; // how long we wait before telling the user "cross-network connect fail ho gaya"
+const ICE_GATHER_TIMEOUT_MS = 15000; // how long we wait before warning about cross-network connection failure
 
 let ws;
 let selfId;
@@ -93,13 +93,13 @@ generateRoomBtn.addEventListener('click', () => {
   const code = generateRoomCode();
   generateRoomBtn.textContent = `✅ Room Code: ${code}`;
   generateRoomBtn.dataset.generatedCode = code;
-  showToast('Room ban gaya! Neeche "Suit Up & Connect" dabao, phir doosre device par ye code daalo.');
+  showToast('Room created! Tap "Suit Up & Connect" below, then enter this code on the other device.');
 });
 
 enterAppBtn.addEventListener('click', () => {
   const typedName = nameInput.value.trim();
   if (!typedName) {
-    setupError.textContent = '⚠️ Pehle apna device ka naam likho.';
+    setupError.textContent = '⚠️ Enter your device name first.';
     nameInput.focus();
     return;
   }
@@ -110,7 +110,7 @@ enterAppBtn.addEventListener('click', () => {
   } else if (joinMode === 'join') {
     roomCode = joinCodeInput.value.trim();
     if (!roomCode) {
-      setupError.textContent = '⚠️ Doosre device wala room-code daalo.';
+      setupError.textContent = '⚠️ Enter the room code from the other device.';
       joinCodeInput.focus();
       return;
     }
@@ -146,9 +146,9 @@ if (copyCodeBtn) {
   copyCodeBtn.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(roomCodeValue.textContent);
-      showToast('📋 Room code copy ho gaya!');
+      showToast('📋 Room code copied!');
     } catch (e) {
-      showToast('Copy nahi hua, code manually likh lo: ' + roomCodeValue.textContent);
+      showToast('Copy failed. Enter the code manually: ' + roomCodeValue.textContent);
     }
   });
 }
@@ -171,8 +171,8 @@ function connectSignaling() {
 
   ws.onopen = () => {
     statusEl.textContent = currentRoomCode
-      ? `Online — room "${currentRoomCode}" me`
-      : 'Online — same WiFi par dhoondh raha hai...';
+      ? `Online — in room "${currentRoomCode}"`
+      : 'Online — searching on the same WiFi...';
     statusEl.classList.add('online');
   };
 
@@ -203,18 +203,33 @@ function renderPeers(list) {
     emptyState.style.display = 'block';
     peerGrid.style.display = 'none';
     statusEl.textContent = currentRoomCode
-      ? `Online — room "${currentRoomCode}" me abhi koi aur nahi hai`
-      : 'Online — koi doosra device nahi mila abhi';
+      ? `Online — no one else is in room "${currentRoomCode}" yet`
+      : 'Online — no other device found yet';
     return;
   }
   emptyState.style.display = 'none';
   peerGrid.style.display = 'grid';
-  statusEl.textContent = `Online — ${list.length} device mila`;
+  statusEl.textContent = `Online — found ${list.length} device(s)`;
 
   list.forEach(p => {
     const card = document.createElement('div');
     card.className = 'peer-card';
-    card.innerHTML = `<div class="peer-avatar">🦾</div><div class="peer-name">${escapeHtml(p.name)}</div><div class="peer-status" data-peer-status="${p.id}">tap karke bhejo</div>`;
+    const avatarEl = document.createElement('div');
+    avatarEl.className = 'peer-avatar';
+    avatarEl.textContent = '🦾';
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'peer-name';
+    nameEl.textContent = p.name;
+
+    const statusLabelEl = document.createElement('div');
+    statusLabelEl.className = 'peer-status';
+    statusLabelEl.setAttribute('data-peer-status', p.id);
+    statusLabelEl.textContent = 'tap to send';
+
+    card.appendChild(avatarEl);
+    card.appendChild(nameEl);
+    card.appendChild(statusLabelEl);
     card.onclick = () => {
       pendingPeerToPick = p.id;
       fileInput.click();
@@ -292,13 +307,13 @@ function getOrCreatePeerConnection(peerId) {
   conn.oniceconnectionstatechange = () => {
     const state = conn.iceConnectionState;
     if (state === 'checking') {
-      setPeerStatusLabel(peerId, 'connect ho raha hai…');
+      setPeerStatusLabel(peerId, 'connecting…');
       clearTimeout(peers[peerId].connectTimer);
       peers[peerId].connectTimer = setTimeout(() => {
         if (['checking', 'new'].includes(conn.iceConnectionState) && !peers[peerId].reportedFailure) {
           peers[peerId].reportedFailure = true;
-          setPeerStatusLabel(peerId, '⚠️ connect nahi ho pa raha');
-          showToast('⚠️ Cross-network connect slow/fail ho raha hai — dono device ka internet check karo, ya thodi der baad phir try karo.');
+          setPeerStatusLabel(peerId, '⚠️ unable to connect');
+          showToast('⚠️ Cross-network connection is slow/failing — check internet on both devices, then try again shortly.');
         }
       }, ICE_GATHER_TIMEOUT_MS);
     } else if (state === 'connected' || state === 'completed') {
@@ -307,15 +322,15 @@ function getOrCreatePeerConnection(peerId) {
       setPeerStatusLabel(peerId, '✅ connected');
     } else if (state === 'failed') {
       clearTimeout(peers[peerId].connectTimer);
-      setPeerStatusLabel(peerId, '❌ connect fail — retry ho raha hai');
+      setPeerStatusLabel(peerId, '❌ connection failed — retrying');
       if (!peers[peerId].reportedFailure) {
         peers[peerId].reportedFailure = true;
-        showToast('❌ Connection fail ho gaya. Dono device ka internet on hai check karo — VPN band karke bhi try karo.');
+        showToast('❌ Connection failed. Make sure internet is on for both devices — also try again with VPN turned off.');
       }
       // best-effort self-heal: nudge ICE to re-negotiate a fresh route
       try { conn.restartIce(); } catch (e) {}
     } else if (state === 'disconnected') {
-      setPeerStatusLabel(peerId, '⚠️ network flaky hai…');
+      setPeerStatusLabel(peerId, '⚠️ network is unstable…');
     }
   };
 
@@ -350,7 +365,7 @@ async function sendFiles(peerId, fileList) {
   const conn = peer.conn;
 
   if (!peer.channel || peer.channel.readyState !== 'open') {
-    setPeerStatusLabel(peerId, 'connect ho raha hai…');
+    setPeerStatusLabel(peerId, 'connecting…');
     const channel = conn.createDataChannel('files');
     setupChannel(peerId, channel);
     const offer = await conn.createOffer();
