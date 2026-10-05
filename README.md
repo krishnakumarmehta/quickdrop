@@ -1,5 +1,5 @@
 # QuickDrop ⚡ — Instant P2P File Sharing
-### Developed by Aditya
+### Developed by Krishna
 
 Jaise Snapdrop/AirDrop kaam karta hai — same WiFi par jitne bhi device browser me ye website kholenge, wo apne aap ek-doosre ko dekh lenge aur direct (peer-to-peer, WebRTC) file bhej sakenge. File server se hoke nahi jaati, isliye speed WiFi jitni fast hoti hai. **PC↔PC, PC↔Mobile, Mobile↔Mobile — sab combination me kaam karta hai.**
 
